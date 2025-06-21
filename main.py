@@ -14,13 +14,11 @@ class ModernSoundKeyboardApp:
     def __init__(self, root):
         self.root = root
         
-        # Загрузка иконки
         try:
             self.root.iconbitmap('VortexBoard.ico')
         except Exception as e:
             print(f"Ошибка загрузки иконки: {e}")
         
-        # Инициализация методов (должны быть с правильными отступами)
         self.setup_app()
         self.init_audio()
         self.load_settings()
@@ -29,7 +27,7 @@ class ModernSoundKeyboardApp:
         self.apply_theme()
         self.setup_animations()
 
-    def setup_app(self):  # ← Этот метод ДОЛЖЕН быть с отступом уровня класса
+    def setup_app(self):
         """Настройка основного окна"""
         self.root.title("VortexBoard")
         self.root.geometry("500x400")
@@ -38,7 +36,6 @@ class ModernSoundKeyboardApp:
         
         
         
-        # Локализация
         self.languages = {
             'en': {
                 'title': "VortexBoard",
@@ -72,7 +69,6 @@ class ModernSoundKeyboardApp:
             }
         }
         
-        # Настройки
         self.settings = {
             'volume': 0.7,
             'enabled': True,
@@ -83,7 +79,6 @@ class ModernSoundKeyboardApp:
         }
 
     def setup_animations(self):
-        """Инициализация анимаций"""
         self.animations = {
             'checkbutton': {
                 'frames': [],
@@ -92,7 +87,6 @@ class ModernSoundKeyboardApp:
             }
         }
         
-        # Создаем кадры анимации для чекбоксов
         for i in range(1, 11):
             color = "#4CAF50" if not self.settings['dark_mode'] else "#81C784"
             alpha = int(255 * (i / 10))
@@ -105,7 +99,6 @@ class ModernSoundKeyboardApp:
             self.animations['checkbutton']['frames'].append(ImageTk.PhotoImage(img))
 
     def animate_checkbutton(self, widget, state):
-        """Анимация переключения чекбокса"""
         if state:
             frames = self.animations['checkbutton']['frames']
         else:
@@ -121,7 +114,6 @@ class ModernSoundKeyboardApp:
         update_frame()
 
     def load_themes(self):
-        """Загружает все доступные темы звуков"""
         themes = {}
         base_dir = 'sound_packs'
         
@@ -132,13 +124,11 @@ class ModernSoundKeyboardApp:
         default_path = os.path.join(base_dir, 'default')
         if not os.path.exists(default_path):
             os.makedirs(default_path)
-            # Создаем пустые файлы звуков по умолчанию
             for sound in ['space.wav', 'delete.wav', 'key1.wav', 'key2.wav']:
                 open(os.path.join(default_path, sound), 'a').close()
         
         themes['default'] = {'name': 'Default', 'path': default_path}
         
-        # Загружаем дополнительные темы
         for theme_name in os.listdir(base_dir):
             theme_path = os.path.join(base_dir, theme_name)
             if theme_name != 'default' and os.path.isdir(theme_path):
@@ -147,7 +137,6 @@ class ModernSoundKeyboardApp:
         return themes
 
     def init_audio(self):
-        """Инициализация аудиосистемы"""
         pygame.mixer.init()
         pygame.mixer.set_num_channels(32)
         self.active_keys = set()
@@ -155,12 +144,9 @@ class ModernSoundKeyboardApp:
         self.themes = self.load_themes()
 
     def create_widgets(self):
-        """Создание интерфейса"""
-        # Главный контейнер
         main_frame = ttk.Frame(self.root, padding=10)
         main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Панель языка в правом верхнем углу
         lang_frame = ttk.Frame(main_frame)
         lang_frame.pack(anchor=tk.NE, padx=5, pady=5)
         
@@ -170,7 +156,6 @@ class ModernSoundKeyboardApp:
         self.lang_combo.pack(side=tk.LEFT)
         self.lang_combo.bind('<<ComboboxSelected>>', self.change_language)
         
-        # Настройки
         self.settings_frame = ttk.LabelFrame(
             main_frame,
             text=self.languages[self.settings['language']]['settings'],
@@ -178,7 +163,6 @@ class ModernSoundKeyboardApp:
         )
         self.settings_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Выбор темы
         ttk.Label(self.settings_frame, 
                  text=self.languages[self.settings['language']]['theme']).grid(
                      row=0, column=0, sticky=tk.W, pady=5)
@@ -191,7 +175,6 @@ class ModernSoundKeyboardApp:
         self.theme_combo.grid(row=0, column=1, sticky=tk.EW, padx=5)
         self.theme_combo.bind('<<ComboboxSelected>>', self.change_theme)
         
-        # Громкость
         ttk.Label(self.settings_frame, 
                  text=self.languages[self.settings['language']]['volume']).grid(
                      row=1, column=0, sticky=tk.W, pady=5)
@@ -205,7 +188,6 @@ class ModernSoundKeyboardApp:
         self.volume_scale.set(self.settings['volume'] * 100)
         self.volume_scale.grid(row=1, column=1, sticky=tk.EW, padx=5)
         
-        # Включение звуков
         self.enable_var = tk.BooleanVar(value=self.settings['enabled'])
         self.enable_check = ttk.Checkbutton(
             self.settings_frame,
@@ -215,7 +197,6 @@ class ModernSoundKeyboardApp:
         )
         self.enable_check.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=5)
         
-        # Защита от повторов
         self.repeat_var = tk.BooleanVar(value=self.settings['prevent_repeats'])
         self.repeat_check = ttk.Checkbutton(
             self.settings_frame,
@@ -224,8 +205,7 @@ class ModernSoundKeyboardApp:
             command=lambda: [self.toggle_repeat(), self.animate_checkbutton(self.repeat_check, self.repeat_var.get())]
         )
         self.repeat_check.grid(row=3, column=0, columnspan=2, sticky=tk.W, pady=5)
-        
-        # Внешний вид
+          
         ttk.Label(self.settings_frame,
                  text=self.languages[self.settings['language']]['appearance']).grid(
                      row=4, column=0, sticky=tk.W, pady=5)
@@ -241,7 +221,6 @@ class ModernSoundKeyboardApp:
         self.appearance_combo.grid(row=4, column=1, sticky=tk.EW, padx=5)
         self.appearance_combo.bind('<<ComboboxSelected>>', self.change_appearance)
         
-        # Кнопки управления
         btn_frame = ttk.Frame(main_frame)
         btn_frame.pack(fill=tk.X, pady=10)
         
@@ -265,14 +244,10 @@ class ModernSoundKeyboardApp:
         ttk.Label(main_frame, textvariable=self.status_var).pack(side=tk.BOTTOM)
 
     def update_ui_language(self):
-        """Обновляет весь интерфейс при смене языка"""
-        # Обновляем заголовок окна
         self.root.title(self.languages[self.settings['language']]['title'])
         
-        # Обновляем фрейм настроек
         self.settings_frame.config(text=self.languages[self.settings['language']]['settings'])
         
-        # Обновляем все текстовые элементы
         for child in self.settings_frame.winfo_children():
             if isinstance(child, ttk.Label):
                 text = child.cget('text')
@@ -281,41 +256,33 @@ class ModernSoundKeyboardApp:
                         child.config(text=self.languages[self.settings['language']][key])
                         break
         
-        # Обновляем комбобоксы
         self.appearance_combo['values'] = [
             self.languages[self.settings['language']]['light'],
             self.languages[self.settings['language']]['dark']
         ]
         
-        # Обновляем кнопки
         self.open_folder_btn.config(text=self.languages[self.settings['language']]['open_folder'])
         self.add_theme_btn.config(text=self.languages[self.settings['language']]['add_theme'])
         
-        # Обновляем статус
         self.status_var.set(self.languages[self.settings['language']]['status_ready'])
         
-        # Обновляем язык в комбобоксе выбора языка
         self.lang_combo.set(self.settings['language'])
 
     def change_language(self, event):
-        """Обработчик смены языка"""
         self.settings['language'] = self.lang_combo.get()
         self.save_settings()
         self.update_ui_language()
 
     def apply_theme(self):
-        """Применяем выбранную тему оформления"""
         style = ttk.Style()
         
         if self.settings['dark_mode']:
-            # Темная тема с градиентами
             bg = '#2d2d2d'
             fg = '#ffffff'
             accent = '#4CAF50'
             
             style.theme_use('clam')
             
-            # Основные стили
             style.configure('.', 
                           background=bg, 
                           foreground=fg,
@@ -329,7 +296,6 @@ class ModernSoundKeyboardApp:
             style.configure('TLabelframe', background=bg, foreground=fg)
             style.configure('TLabelframe.Label', background=bg, foreground=accent)
             
-            # Кнопки
             style.configure('TButton', 
                           background='#3d3d3d',
                           foreground=fg,
@@ -339,7 +305,6 @@ class ModernSoundKeyboardApp:
             style.map('TButton',
                     background=[('active', '#4d4d4d'), ('pressed', '#5d5d5d')])
             
-            # Чекбоксы
             style.configure('TCheckbutton', 
                            background=bg,
                            foreground=fg,
@@ -349,7 +314,6 @@ class ModernSoundKeyboardApp:
                      background=[('active', bg)],
                      foreground=[('active', fg)])
             
-            # Комбобоксы
             style.configure('TCombobox',
                           fieldbackground='#3d3d3d',
                           background='#3d3d3d',
@@ -357,7 +321,6 @@ class ModernSoundKeyboardApp:
                           selectbackground=accent,
                           selectforeground=fg)
             
-            # Шкала
             style.configure('Horizontal.TScale',
                           background=bg,
                           troughcolor='#3d3d3d',
@@ -367,14 +330,12 @@ class ModernSoundKeyboardApp:
             
             self.root.config(bg=bg)
         else:
-            # Светлая тема с градиентами
             bg = '#f5f5f5'
             fg = '#333333'
             accent = '#2196F3'
             
             style.theme_use('clam')
             
-            # Основные стили
             style.configure('.', 
                           background=bg, 
                           foreground=fg,
@@ -388,7 +349,6 @@ class ModernSoundKeyboardApp:
             style.configure('TLabelframe', background=bg, foreground=fg)
             style.configure('TLabelframe.Label', background=bg, foreground=accent)
             
-            # Кнопки
             style.configure('TButton', 
                           background='#e0e0e0',
                           foreground=fg,
@@ -398,7 +358,6 @@ class ModernSoundKeyboardApp:
             style.map('TButton',
                     background=[('active', '#d0d0d0'), ('pressed', '#c0c0c0')])
             
-            # Чекбоксы
             style.configure('TCheckbutton', 
                            background=bg,
                            foreground=fg,
@@ -408,7 +367,6 @@ class ModernSoundKeyboardApp:
                      background=[('active', bg)],
                      foreground=[('active', fg)])
             
-            # Комбобоксы
             style.configure('TCombobox',
                           fieldbackground='#ffffff',
                           background='#ffffff',
@@ -416,7 +374,6 @@ class ModernSoundKeyboardApp:
                           selectbackground=accent,
                           selectforeground='#ffffff')
             
-            # Шкала
             style.configure('Horizontal.TScale',
                           background=bg,
                           troughcolor='#e0e0e0',
@@ -427,18 +384,15 @@ class ModernSoundKeyboardApp:
             self.root.config(bg=bg)
 
     def start_keyboard_listener(self):
-        """Запуск обработки клавиш"""
         keyboard.hook(self.on_key_event)
         self.thread = Thread(target=self.keyboard_loop, daemon=True)
         self.thread.start()
 
     def keyboard_loop(self):
-        """Цикл обработки клавиш"""
         while self.running:
             keyboard.wait()
 
     def on_key_event(self, event):
-        """Обработчик событий клавиатуры"""
         if not self.settings['enabled']:
             return
             
@@ -453,18 +407,15 @@ class ModernSoundKeyboardApp:
             self.active_keys.discard(event.name)
 
     def play_sound(self, key):
-        """Воспроизведение звука для клавиши"""
         theme = self.themes.get(self.settings['current_theme'])
         if not theme:
             return
             
-        # Определяем какой звук воспроизводить
         if key == 'space':
             sound_file = 'space.wav'
         elif key == 'delete':
             sound_file = 'delete.wav'
         else:
-            # Для остальных клавиш - случайный выбор из key1.wav, key2.wav
             available = []
             for i in range(1, 3):
                 if os.path.exists(f"{theme['path']}/key{i}.wav"):
@@ -484,7 +435,6 @@ class ModernSoundKeyboardApp:
             self.status_var.set("Sound error")
 
     def change_appearance(self, event):
-        """Изменение темы оформления"""
         lang = self.settings['language']
         is_dark = self.appearance_combo.get() == self.languages[lang]['dark']
         self.settings['dark_mode'] = is_dark
@@ -553,7 +503,6 @@ class ModernSoundKeyboardApp:
         self.root.destroy()
 
 def hex_to_rgb(hex_color):
-    """Конвертирует HEX цвет в RGB"""
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
